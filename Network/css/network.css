@@ -1,0 +1,121 @@
+.slider{
+    
+    width: 24%;
+    height: 78.5%;
+    border: 1px solid #000;
+    background-color: #fff;
+    position: fixed;
+    right: 0.5%;
+    top: 0.5%;
+    bottom: 0.5%;
+   
+    /* for text wrapping*/
+   white-space: pre-wrap;      /* CSS3 */   
+   white-space: -moz-pre-wrap; /* Firefox */    
+   white-space: -pre-wrap;     /* Opera <7 */   
+   white-space: -o-pre-wrap;   /* Opera 7 */    
+   word-wrap: break-word;  
+    
+    /* For scrolling for those with many projects/contributors*/
+    overflow:scroll;
+    overflow-x:hidden;
+    
+}
+
+.instructions{
+
+    width: 24%;
+    height: 78.5%;
+    position: fixed;
+    right: 0.5%;
+    top: 0.5%;
+    bottom: 0.5%;
+    z-index: -1;
+
+}
+
+#container {
+    position: relative;
+    height: 800px;
+    width: 75%;
+    border-right: 1px #ccc dashed;
+}
+
+/* Control panel: */
+.control-panel {
+  color: #666;
+  border-top: 1px #ccc dashed;
+  border-left: 1px #ccc dashed;
+  background: #fff;
+  height: 21.5%;
+  width: 25.15%;
+  position: absolute;
+  right: 0px;
+}
+.move-up {
+  position: absolute;
+  bottom: 100px;
+  left: 80px;
+  margin: 5px;
+}
+.move-down {
+  position: absolute;
+  bottom: 60px;
+  left: 80px;
+  margin: 5px;
+}
+.move-left {
+  position: absolute;
+  bottom: 80px;
+  left: 50px;
+  margin: 5px;
+}
+.move-right {
+  position: absolute;
+  bottom: 80px;
+  left: 110px;
+  margin: 5px;
+}
+.zoom-in {
+  position: absolute;
+  bottom: 100px;
+  left: 200px;
+  margin: 5px;
+}
+.zoom-out {
+  position: absolute;
+  bottom: 60px;
+  left: 200px;
+  margin: 5px;
+}
+.refresh {
+  position: absolute;
+  bottom: 80px;
+  left: 200px;
+  margin: 5px;
+}
+.ui-widget {
+  position: absolute;
+  top: 10px;
+  left: 35px;
+  margin: 5px;
+}
+.checkbox {
+  position: absolute;
+  top: 50px;
+  left: 35px;
+  margin: 5px;
+}
+.nameSearch {
+  position: absolute;
+  top: 15px;
+  left: 365px;
+  margin: 5px;
+}
+/* Autocomplete style */
+p#copyright { margin: 20px 10px; font-size: 90%; color: #999; }
+
+ul li {list-style: none; cursor: pointer;}
+li.smart_autocomplete_highlight {background-color: #9d9d9d;}
+ul { margin: 10px 0; padding: 5px; background-color: #e2e2e2; }
+*/

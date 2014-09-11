@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> OSF sigma demo by dpmartin42</title>
+  
+	<!-- Import Sigma JS, JQuery, and css -->
+	<script type="text/javascript" src="../js/sigma.min.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="../js/jquery.smart_autocomplete.js"></script>
+	<script type="text/javascript" src="../js/jquery-ui.js"></script>
+	<script type="text/javascript" src="../js/sigma.parsers.json.js"></script>
+	<script type="text/javascript" src="../js/plotJsonNetwork.js"></script>
+	<script type="text/javascript" src="../js/printMetadata.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="../css/network.css">
+	<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+  
+</head>
+
+<body>
+  <div id="main">
+  
+  <div class="slider" id="slider" style="display:none"></div>
+  
+  <div class="instructions">
+  
+  <b>Collaborator Network for Public Projects</b>
+  
+  <p>Lighter nodes represent public projects that have 8 or more contributors.
+  Darker nodes represent users who are contributors on 2 or more public projects that are not 
+  classified as a lighter node. Connections between nodes represent co-contributorship. Node size is
+  determined by the square root of a measure of betweenness-centrality, while edge size is determined by
+  the square root of the number of collaborations between two nodes.
+  
+  <p> Using the navigation toolbar below, users can find an autocomplete searchbox, directional
+  navigation/zoom buttons, and a checkbox to toggle the network layout. Either searching a name or
+  clicking on an individual node will activate a slider containing that particular node's metadata.
+  
+  </div>
+  
+    <div class="sigma-container">
+        <div id="container"></div>
+    </div>
+    
+    <div class="control-panel">
+        <div class="move-up">
+            <button type="button">
+                <i class="icon-arrow-up"></i>
+            </button>
+        </div>
+        <div class="move-down">
+            <button type="button">
+                <i class="icon-arrow-down"></i>
+            </button>
+        </div>
+        <div class="move-left">
+            <button type="button">
+                <i class="icon-arrow-left"></i>
+            </button>
+        </div>
+        <div class="move-right">
+            <button type="button">
+                <i class="icon-arrow-right"></i>
+            </button>
+        </div>
+        
+        <div class="zoom-in">
+            <button type="button">
+                <i class="icon-zoom-in"></i>
+            </button>
+        </div>
+        
+        <div class="zoom-out">
+            <button type="button">
+                <i class="icon-zoom-out"></i>
+            </button>
+        </div>
+        
+        <div class="refresh">
+            <button type="button">
+                <i class="icon-resize-full"></i>
+            </button>
+        </div>
+        
+        <div class="nameSearch">
+            <button type="button">
+                Search
+            </button>
+        </div>
+
+        <div class="ui-widget">
+          <label for="tags">Names: </label>
+          <input id="tags">
+        </div>
+        
+        <!--<div class="checkbox">
+            <input type="checkbox" name="cluster" value="false">Show clusters<br>
+        </div>-->
+                            
+ </div> 
+
+<script type='text/javascript'>
+
+$(document).ready(function() {
+    $( "#tags" ).smartAutoComplete({
+      source: 'data/osfNames.json',
+      maxResults: 8,
+      delay: 100,
+      forceSelect: true
+	});
+});
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+	var k,
+        neighbors = {},
+        index = this.allNeighborsIndex[nodeId] || {};
+
+    for (k in index)
+      neighbors[k] = this.nodesIndex[k];
+
+    return neighbors;
+});
+
+s = new sigma({
+	container: 'container',
+	settings: {
+		minNodeSize: 6,
+		maxNodeSize: 14,
+		minEdgeSize: 0.1,
+		maxEdgeSize: 2,
+		labelThreshold: 20,
+		singleHover: true
+	}
+});
+
+plotJsonNetwork('data/clean_network_with_metadata.json');
+
+// clear the sigma instance when the box is checked
+// then just re-draw with the different colors        
+/*        
+$(document).ready(function(){
+        $(":checkbox").change(function(){
+        if($(this).attr("checked"))
+        {
+            s.graph.clear();
+            plotJsonNetwork('data/miserablesClean.json');
+
+        }
+        else
+        {
+           s.graph.clear();
+           plotJsonNetwork('data/miserablesCleanNoClust.json');
+        
+        }
+    });
+}); 
+*/    
+
+// re-locate graph to the searched node and highlight it
+        
+$(document).ready(function(){
+  $(".nameSearch").bind("click",function(){
+        
+        nodeLabel = $('#tags').val();
+        
+        s.graph.nodes().forEach(function(node, i, a) {
+        	
+          if (node.label == nodeLabel) {
+              selectedNode = node;
+              return selectedNode;
+          }
+          
+        });
+        
+        c.goTo({
+            x:selectedNode['read_cam0:x'],y:selectedNode['read_cam0:y'],ratio:1
+      	}); 
+ 
+ 		// trigger user click here and delete up to refresh below...keep selectedNode = null;
+ 
+      	var nodeId = selectedNode.id,
+        toKeep = s.graph.neighbors(nodeId);
+    	toKeep[nodeId] = selectedNode;
+
+    	s.graph.nodes().forEach(function(n) {
+        	if (toKeep[n.id])
+            	n.color = n.originalColor;
+        	else
+            	n.color = '#eee';
+    	});
+
+    	s.graph.edges().forEach(function(e) {
+        	if (toKeep[e.source] && toKeep[e.target]){
+        		e.hidden = false;
+        		e.color = e.originalColor;	
+        	}
+        	else
+            	e.hidden = true;
+    	});
+    	
+
+    	// Since the data has been modified, we need to
+    	// call the refresh method to make the colors
+    	// update effective.
+   		s.refresh();
+   		
+   		// display user information on click
+   		printMetadata(selectedNode);
+      
+      	if($(".slider").is(":hidden")){
+      		$(".slider").toggle("slide", {direction: 'right'}, 1000);
+      	}    
+    
+      	// delete value so it doesn't revert to a previous search
+      	selectedNode = null;
+
+  });
+});
+
+
+</script>
+
+<!--highlight neighboring nodes on a user click-->
+
+<script type="text/javascript" src="../js/plotNeighbors.js"></script>
+
+<!--navigation buttons for the sigma instance-->
+
+<script type="text/javascript" src="../js/navigationButtons.js"></script>
+
+</body>
+</html>
+
